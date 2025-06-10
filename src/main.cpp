@@ -6,6 +6,20 @@
 
 using namespace std;
 
+static void translate_camera_on_m2(Camera2D *camera) {
+    Vector2 delta = GetMouseDelta();
+    delta = Vector2Scale(delta, -1.0f/camera->zoom);
+    camera->target = Vector2Add(camera->target, delta);
+}
+
+static void zoom_camera_on_mouse_wheel(Camera2D *camera, float wheel) {
+    Vector2 mouse_world_pos = GetScreenToWorld2D(GetMousePosition(), *camera);
+    camera->offset = GetMousePosition();
+    camera->target = mouse_world_pos;
+    float scale = 0.2f * wheel;
+    camera->zoom = max(expf(logf(camera->zoom) + scale), 0.125f);
+}
+
 int main(int argc, char **argv) {
     float angulo = -PI / 3.0f;
     if (argc == 2 && strcmp(argv[1], "-i") == 0) {
@@ -14,6 +28,9 @@ int main(int argc, char **argv) {
 
     InitWindow(950, 950, "koch");
     SetTargetFPS(60);
+
+    Camera2D camera = {0};
+    camera.zoom = 1.0f;
 
     float comprimento = 800;
     float altura = sqrt(3) / 2 * comprimento;
@@ -59,8 +76,17 @@ int main(int argc, char **argv) {
             }
         }
 
+        float wheel = GetMouseWheelMove();
+        if (wheel != 0) {
+            zoom_camera_on_mouse_wheel(&camera, wheel);
+        }
+        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+            translate_camera_on_m2(&camera);
+        }
+
         BeginDrawing();
         ClearBackground(WHITE);
+        BeginMode2D(camera);
         for (auto it = pontos1.begin(); it != prev(pontos1.end()); it++) {
             DrawLineV(*it, *next(it), BLACK);
         }
@@ -71,6 +97,7 @@ int main(int argc, char **argv) {
             DrawLineV(*it, *next(it), BLACK);
         }
         EndDrawing();
+        EndMode2D();
     }
     CloseWindow();
 
