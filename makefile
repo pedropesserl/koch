@@ -1,28 +1,22 @@
 CC = g++
 PROGRAM = koch
-CFLAGS = -Iinclude -Wall -Wextra -Wshadow -Wno-missing-field-initializers
-LFLAGS = -lm -lraylib 
+SRC_PATH = src
+INC_PATH = include
+RAYLIB_PATH = /home/pedro/software/raylib/src
 
-_OBJ = main.o
-_DEPS = raylib.h raymath.h
+CFLAGS = -Iinclude -I$(RAYLIB_PATH) -Wall -Wextra -Wshadow -Wno-missing-field-initializers -g
+LFLAGS = -L$(RAYLIB_PATH) -lm -lraylib
 
-SDIR = src
-IDIR = include
+_SRC = main
+_DEPS =
 
-OBJ = $(_OBJ:%=$(SDIR)/%)
-DEPS = $(_DEPS:%=$(IDIR)/%)
+SRC = $(_SRC:%=$(SRC_PATH)/%.cpp)
+DEPS = $(RAYLIB_PATH)/raylib.h $(RAYLIB_PATH)/raymath.h
 
-%.o: %.cpp $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+$(PROGRAM): $(SRC) $(DEPS)
+	$(CC) -o $@ $(SRC) $(CFLAGS) $(LFLAGS)
 
 all: $(PROGRAM)
-all: clean
-
-$(PROGRAM): $(OBJ)
-	$(CC) -o $@ $^ $(LFLAGS)
-
-clean:
-	rm -f $(OBJ)
 
 purge:
-	rm -f $(OBJ) $(PROGRAM)
+	rm -f $(PROGRAM)
