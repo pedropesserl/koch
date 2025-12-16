@@ -11,27 +11,27 @@ Point rotate_point_around(Point point, Point center, float angle) {
     return new_point;
 }
 
-Triangle rotate_tri_around(Triangle tri, Point center, float angle) {
-    return (Triangle){
-        .p1 = rotate_point_around(tri.p1, center, angle),
-        .p2 = rotate_point_around(tri.p2, center, angle),
-        .p3 = rotate_point_around(tri.p3, center, angle),
+triangle_t rotate_tri_around(triangle_t tri, Point center, float angle) {
+    return {
+        rotate_point_around(tri.p1, center, angle),
+        rotate_point_around(tri.p2, center, angle),
+        rotate_point_around(tri.p3, center, angle),
     };
 }
 
-bool check_collision_tri_rec(Triangle tri, Rectangle rec) {
-    if (CheckCollisionPointRec(tri.p1, rec)
-        || CheckCollisionPointRec(tri.p2, rec)
-        || CheckCollisionPointRec(tri.p3, rec)) {
-        return true;
-    }
+bool check_collision_tri_rec(triangle_t tri, rectangle_t rec) {
     vector<Point> tri_points = { tri.p1, tri.p2, tri.p3 };
-    vector<Point> rec_points = {
-        { rec.x, rec.y },
-        { rec.x + rec.width, rec.y },
-        { rec.x + rec.width, rec.y + rec.height },
-        { rec.x, rec.y + rec.height },
-    };
+    vector<Point> rec_points = { rec.p1, rec.p2, rec.p3, rec.p4 };
+    for (Point p : tri_points) {
+        if (CheckCollisionPointPoly(p, rec_points.data(), 4)) {
+            return true;
+        }
+    }
+    for (Point p : rec_points) {
+        if (CheckCollisionPointTriangle(p, tri.p1, tri.p2, tri.p3)) {
+            return true;
+        }
+    }
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 4; j++) {
             if (CheckCollisionLines(tri_points[i], tri_points[(i + 1) % 3],

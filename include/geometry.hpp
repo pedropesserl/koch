@@ -5,14 +5,18 @@
 
 using Point = Vector2;
 
-struct Triangle {
+struct triangle_t {
     Point p1, p2, p3;
+};
+
+struct rectangle_t {
+    Point p1, p2, p3, p4;
 };
 
 Point rotate_point_around(Point point, Point center, float angle);
 
-Triangle rotate_tri_around(Triangle tri, Point center, float angle);
+triangle_t rotate_tri_around(triangle_t tri, Point center, float angle);
 
-bool check_collision_tri_rec(Triangle tri, Rectangle rec);
+bool check_collision_tri_rec(triangle_t tri, rectangle_t rec);
 
 #endif // GEOMETRY_HPP_
